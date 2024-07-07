@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: balance_app_dev
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: on-failure
+    environment:
+      NODE_ENV: development
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: balance_app_dev
+      DB_HOST: db
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
