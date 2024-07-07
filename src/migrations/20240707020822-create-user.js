@@ -13,6 +13,11 @@ module.exports = {
       balance: {
         type: DataTypes.INTEGER
       },
+      version: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

@@ -1,0 +1,13 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 20
+      arrivalRate: 500
+
+scenarios:
+  - flow:
+    - post:
+        url: '/update-balance'
+        json:
+          userId: 1
+          amount: -2
