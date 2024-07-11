@@ -1,35 +1,24 @@
-const { User } = require('../utils/db');
+const { User, sequelize } = require('../utils/db');
 
 const updateBalance = async (userId, amount) => {
-  let success = false;
-  while (!success) {
-    const user = await User.findByPk(userId);
-    if (!user) {
-      console.log("1")
-      throw new Error('User not found');
-    }
+      return await sequelize.transaction(async (transaction) => {
+          const user = await User.findOne({ where: { id: userId }, lock: true, transaction });
 
-    const newBalance = user.balance + amount;
-    if (newBalance < 0) {
-      console.log("2")
-      throw new Error('Insufficient funds');
-    }
+          if (!user) {
+            throw new Error('User not found');
+          }
 
-    const [updated] = await User.update(
-      { balance: newBalance, version: user.version + 1 },
-      {
-        where: {
-          id: userId,
-          version: user.version
-        }
-      }
-    );
-    if (updated) {
-      success = true;
-      return await User.findByPk(userId);
-    }
-  }
+          if (user.balance + amount < 0) {
+              throw new Error('Insufficient funds');
+          }
+
+          user.balance += amount;
+          await user.save({ transaction });
+          return user
+      });
+
 };
+
 
 module.exports = {
   updateBalance
